@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bar Chart with D3.js</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      /* CSS styling for the chart */
+      .chart {
+        width: 1000px;
+        height: 600px;
+        margin: 50px auto;
+        
+      }
+
+      .bar1 {
+        fill: rgb(120, 20, 60);
+      }
+      .bar2 {
+        fill: rgb(200, 20, 60);
+      }
+      .bar3 {
+        fill: rgb(250, 30, 60);
+      }
+      .bar4 {
+        fill: rgb(420, 20, 60);
+      }
+      .bar5 {
+        fill: rgb(520, 20, 60);
+      }
+      .bar6 {
+        fill: rgb(120, 50, 60);
+      }
+      .bar7 {
+        fill: rgb(220, 50, 60);
+      }
+      .bar8 {
+        fill: rgb(320, 50, 90);
+      }
+      .bar9 {
+        fill: rgb(220, 50, 90);
+      }
+      .bar10 {
+        fill: rgb(120, 60, 60);
+      }
+      .bar11 {
+        fill: rgb(58, 32, 32);
+      }
+      .bar12 {
+        fill: rgb(162, 52, 89);
+      }
+      .bar13 {
+        fill: rgb(144, 78, 78);
+      }
+      
+
+      .axis--x path {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    
+    <div class="chart"></div>
+
+    <script>
+    // var number = 0;
+      // Load data from CSV file
+      d3.csv("data/provinsi.csv").then(function(data) {
+        // Convert string to number
+        data.forEach(function(d) {
+          d.PT = +d.PT;
+          //   number++;
+          console.log(data.findIndex(x => x.PT === d.PT));
+        });
+        // console.log(data.indexOf(data[33].PT));
+
+        // Sort data by PT in descending order
+        data.sort(function(a, b) {
+          return d3.ascending(+a.PT, +b.PT);
+        });
+
+        // Define chart dimensions and margins
+        var margin = { top: 70, right: 30, bottom: 80, left: 180 },
+          width = 800 - margin.left - margin.right,
+          height = 600 - margin.top - margin.bottom;
+
+        // Define scales for x and y axes
+        var x = d3.scaleLinear().range([0, width]).domain([0, 100]);
+        var y = d3.scaleBand().range([height, 0]).padding(0.1);
+        y.domain(
+          data.map(function(d) {
+            return d.Provinsi;
+          })
+        );
+
+        // Create SVG element and append it to chart div
+        var svg = d3
+          .select(".chart")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Add title to chart
+        svg.append("text")
+          .attr("x", (width / 2))
+          .attr("y", 0 - (margin.top / 2))
+          .attr("text-anchor", "middle")
+          .style("font-size", "13px")
+          .text("Persentase Masyarakat yang Menempuh Pendidikan Perguruan Tinggi dari Terbesar ke Terkecil di Tiap Provinsi Tahun 2017");
+          
+        // Add x-axis to the chart
+        svg
+          .append("g")
+          .attr("class", "axis axis--x")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+
+          // Add label for x-axis
+        svg.append("text")
+            .attr("transform", "translate(" + (width/2) + "," + (height + margin.top + 0) + ")")
+            .style("text-anchor", "middle")
+            .text("Persentase");
+
+        // Add y-axis to the chart
+        svg
+          .append("g")
+          .attr("class", "axis axis--y")
+          .call(d3.axisLeft(y));
+
+          // Add label for y-axis
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin.left)
+            .attr("x", 0 - (height / 2))
+            .attr("dy", "2em")
+            .style("text-anchor", "middle")
+            .text("Provinsi");
+
+          // Add right line
+        svg.append("line")
+            .attr("x1", width)
+            .attr("y1", 0)
+            .attr("x2", width)
+            .attr("y2", height)
+            .attr("stroke", "black");
+
+            // Add line on x axis
+        svg.append("line")
+            .attr("x1", 0)
+            .attr("y1", height)
+            .attr("x2", width)
+            .attr("y2", height)
+            .attr("stroke", "black");
+
+        // Add bars to the chart
+        // for(i =0;i<=number;i++){
+            svg
+            .selectAll(".bar")
+            .data(data)
+            .enter()
+            .append("rect")
+            // .attr("class", "bar")
+            .attr("class", function(d){
+                return "bar".concat(data.findIndex(x => x.PT === d.PT));
+            })
+            .attr("x", 0)
+            .attr("y", function(d) {
+                return y(d.Provinsi);
+            })
+            .attr("width", function(d) {
+                return x(d.PT);
+            })
+            .attr("height", y.bandwidth());
+            
+      });
+    
+    </script>
+  </body>
+</html>

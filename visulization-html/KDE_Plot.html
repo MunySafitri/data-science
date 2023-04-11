@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>KDE Plot using D3.js</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+     body {
+        font-family: sans-serif;
+      }
+      .plot {
+        width: 200px;
+        height: 200px;
+        margin: 0 auto;
+      }
+      .line {
+        fill: none;
+        stroke: rgb(211, 4, 4);
+        stroke-width: 18px;
+      }
+      .area {
+        fill: rgb(226, 130, 130);
+        stroke: none;
+        opacity: 0.6;
+      }
+</style>
+</head>
+<body>
+  <script>
+    // Data
+    var data = [
+        {provinsi: "ACEH", SD: 99.85, SMP: 98.09, SMA: 82.15, PT: 34.28},
+        {provinsi: "SUMATERA UTARA", SD: 99.49, SMP: 96.6, SMA: 76.76, PT: 26.8},
+        {provinsi: "SUMATERA BARAT", SD: 99.5, SMP: 96.29, SMA: 82.86, PT: 35.45},
+        {Provinsi: "MALUKU", SD: 99.72, SMP: 96.86, SMA: 79.08, PT: 38.2},
+        {Provinsi: "KALIMANTAN TIMUR", SD: 99.67, SMP: 98.79, SMA: 81.32, PT: 30.04},
+        {Provinsi: "PAPUA BARAT", SD: 97.27, SMP: 96.92, SMA: 80.6, PT: 31.92},
+        {Provinsi: "BENGKULU", SD: 99.8, SMP: 97.2, SMA: 79.07, PT: 29.9},
+        {Provinsi: "BALI", SD: 99.44, SMP: 97.72, SMA: 82.16, PT: 26.56},
+        {Provinsi: "MALUKU UTARA", SD: 99.19, SMP: 97.24, SMA: 76.06, PT: 32.1},
+        {Provinsi: "NUSA TENGGARA BARAT", SD: 99.43, SMP: 97.69, SMA: 76.61, PT: 28.52},
+        {Provinsi: "KEP. RIAU", SD: 99.32, SMP: 99.08, SMA: 82.8, PT: 19.13},
+        {Provinsi: "SUMATERA UTARA", SD: 99.49, SMP: 96.6, SMA: 76.76, PT: 26.8},
+        {Provinsi: "RIAU", SD: 98.98, SMP: 94.73, SMA: 76.52, PT: 27.28},
+        {Provinsi: "SULAWESI TENGGARA", SD: 99.32, SMP: 94.08, SMA: 72.94, PT: 30.03},
+        {Provinsi: "NUSA TENGGARA TIMUR", SD: 98.27, SMP: 94.76, SMA: 74.65, PT: 27.8},
+        {Provinsi: "SULAWESI SELATAN", SD: 99.16, SMP: 93.09, SMA: 70.6, PT: 32.16},
+        {Provinsi: "DKI JAKARTA", SD: 99.67, SMP: 97.64, SMA: 71.5, PT: 24.6},
+        {Provinsi: "SULAWESI TENGAH", SD: 98.15, SMP: 92.41, SMA: 74.87, PT: 26.31},
+        {Provinsi: "SULAWESI UTARA", SD: 99.37, SMP: 94.91, SMA: 73.04, PT: 24.22},
+        {Provinsi: "JAWA TIMUR", SD: 99.57, SMP: 96.77, SMA: 71.51, PT: 23.34},
+        {Provinsi: "JAMBI", SD: 99.59, SMP: 95.89, SMA: 71.54, PT: 24.12},
+        {Provinsi: "KALIMANTAN UTARA", SD: 98.34, SMP: 96.04, SMA: 75.12, PT: 20.72},
+        {Provinsi: "GORONTALO", SD: 98.76, SMP: 91.23, SMA: 69.86, PT: 29.21},
+        {Provinsi: "JAWA TENGAH", SD: 99.62, SMP: 95.48, SMA: 68.48, PT: 22.13},
+        {Provinsi: "LAMPUNG", SD: 99.78, SMP: 94.76, SMA: 70.03, PT: 20.96},
+        {Provinsi: "KALIMANTAN BARAT", SD: 98.44, SMP: 92.51, SMA: 67.53, PT: 25.8},
+        {Provinsi: "BANTEN", SD: 99.31, SMP: 95.67, SMA: 67.77, PT: 21.33},
+        {Provinsi: "KALIMANTAN SELATAN", SD: 99.55, SMP: 92.33, SMA: 68.3, PT: 23.53},
+        {Provinsi: "KALIMANTAN TENGAH", SD: 99.5, SMP: 93.37, SMA: 66.62, PT: 24.15},
+        {Provinsi: "SUMATERA SELATAN", SD: 99.63, SMP: 94.01, SMA: 69.05, PT: 19.17},
+        {Provinsi: "JAWA BARAT", SD: 99.51, SMP: 93.77, SMA: 66.62, PT: 21.5},
+        {Provinsi: "SULAWESI BARAT", SD: 98.1, SMP: 89.88, SMA: 68.03, PT: 23.49},
+        {Provinsi: "KEP. BANGKA BELITUNG", SD: 99.64, SMP: 92.41, SMA: 66.99, PT: 14.99},
+        {Provinsi: "PAPUA", SD: 81.8, SMP: 79.09, SMA: 63.35, PT: 24.57},
+      
+    ];
+    
+
+    // SVG container
+    var margin = {top: 70, right: 70, bottom: 50, left: 100};
+    var width = 800 - margin.left - margin.right;
+    var height = 520 - margin.top - margin.bottom;
+
+    var svg = d3.select("body")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Scales
+    var x = d3.scaleLinear()
+      .domain([0, 100])
+      .range([0, width]);
+
+    var y = d3.scaleLinear()
+      .domain([0, 0.25])
+      .range([height, 0]);
+
+    // Generate kernel density estimates
+    var kernelDensityEstimator = kernelDensityEstimator(kernelEpanechnikov(2.5), x.ticks(30));
+    var densities = [];
+    var keys = ["SD", "SMP", "SMA", "PT"];
+
+    keys.forEach(function(key) {
+      var density = kernelDensityEstimator(data.map(function(d) {
+        return d[key];
+      }));
+      densities.push({key: key, density: density});
+    });
+
+    // Line generator
+    var line = d3.line()
+        .curve(d3.curveBasis)
+        .x(function(d) { return x(d[0]); })
+        .y(function(d) { return y(d[1]); });
+
+    // Area generator
+    var area = d3.area()
+        .curve(d3.curveBasis)
+        .x(function(d) { return x(d[0]); })
+        .y0(400)
+        .y1(function(d) { return y(d[1]); });
+
+        
+var warna = ["blue", "orange", "green", "red"];
+
+      // Menambahkan legenda
+var legend = svg.selectAll(".legend")
+  .data(keys.slice().reverse())
+  .enter().append("g")
+  .attr("class", "legend")
+  .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+// Menambahkan kotak warna pada legenda
+legend.append("rect")
+  .attr("x", width - -50)
+  .attr("width", 28)
+  .attr("height", 18)
+  .attr("opacity", ".3")
+  .style("fill", function(d) { return getColor(d); });
+
+// Menambahkan teks pada legenda
+legend.append("text")
+  .attr("x", width - -44)
+  .attr("y", 9)
+  .attr("dy", ".35em")
+  .style("text-anchor", "end")
+  .text(function(d) { return d; });
+
+    // Draw KDE plots
+    densities.forEach(function(density,i) {
+      svg.append("path")
+        .datum(density.density)
+        .attr("fill", warna[i])
+        .attr("opacity", "0.3")
+        .attr("stroke", getColor(density.key))
+        .attr("stroke-width", 2)
+        .attr("d", area);
+    });
+
+    
+// Add title to chart
+svg.append("text")
+          .attr("x", (width / 2))
+          .attr("y", 0 - (margin.top / 3))
+          .attr("text-anchor", "middle")
+          .style("font-size", "13px")
+          .text("Distribusi Persentase Angka Partisipasi Sekolah Tahun 2017");
+    // Add axis labels
+    svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x).tickFormat(d3.format(".0f")));
+
+    svg.append("g")
+      .call(d3.axisLeft(y));
+
+    svg.append("text")
+      .attr("x", width / 2)
+      .attr("y", height + margin.bottom)
+      .attr("text-anchor", "middle")
+      .text("Partisipasi Sekolah");
+
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x", 0 - (height / 2))
+      .attr("dy", "3em")
+      .style("text-anchor", "middle")
+      .text("Banyak Data");
+
+      
+
+      
+
+    // Color scale for lines
+    function getColor(key) {
+      switch(key) {
+        case "SD":
+          return "#1f77b4";
+        case "SMP":
+          return "#ff7f0e";
+        case "SMA":
+          return "#2ca02c";
+        case "PT":
+          return "#db1514";
+        default:
+          return "#000000";
+      }
+    }
+
+    
+
+    // Functions for kernel density estimation
+    function kernelDensityEstimator(kernel, x) {
+      return function(sample) {
+        return x.map(function(x) {
+          return [x, d3.mean(sample, function(v) { return kernel(x - v); })];
+        });
+      };
+    }
+
+    function kernelEpanechnikov(k) {
+      return function(v) {
+        return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+      };
+    }
+  </script>
+</body>
+</html>
